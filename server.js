@@ -1,4 +1,5 @@
 const express = require('express');
+const { writeFile } = require('fs');
 const fs = require('fs/promises');
 const path = require('path');
 // const { clog } = require('./middleware/clog');
@@ -27,10 +28,14 @@ app.get('*', (req, res) =>
 
 // API routes:
 // GET /api/notes should read the db.json file and return all saved notes as JSON.
-app.get('/api/notes', (req, res) => res.json('db/db.json'));
+app.get('/api/notes', (req, res) => res.json(require('./db/db.json')));
 
 // POST /api/notes should receive a new note to save on the request body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved (look into npm packages that could do this for you).
-app.post('/api/notes', (req, res) => {});
+app.post('/api/notes', (req, res) => {
+  const newNotes = req.body;
+  writeFile('./db/db.json', newNotes);
+  res.json(`${req.method} received.`);
+});
 
 app.listen(PORT, () =>
   console.log(`App is listening at http://localhost:${PORT} 🚀`),
