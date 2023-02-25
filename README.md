@@ -42,7 +42,8 @@ SO THAT I can organize my thoughts and keep track of tasks I need to complete.
 
 ### Links:
 
-- The URL of the functional, deployed application: https://fierce-thicket-04291.herokuapp.com/
+- The URL of the functional, deployed application:
+  https://fierce-thicket-04291.herokuapp.com/
 
   - https://fierce-thicket-04291.herokuapp.com/
 
