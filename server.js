@@ -1,7 +1,9 @@
+const { text } = require('express');
 const express = require('express');
 const { writeFile } = require('fs');
 const fs = require('fs/promises');
 const path = require('path');
+const uuid = require('uuid/v4');
 // const { clog } = require('./middleware/clog');
 // const api = require('./routes/index.js');
 
@@ -28,9 +30,21 @@ app.get('/api/notes', (req, res) => res.json(require('./db/db.json')));
 
 // POST /api/notes should receive a new note to save on the request body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved (look into npm packages that could do this for you).
 app.post('/api/notes', (req, res) => {
-  const newNotes = req.body;
-  fs.writeFile('./db/db.json', newNotes);
-  res.json(`${req.method} received.`);
+  const { title, text } = req.body;
+  const newNotes = {
+    title,
+    text,
+    id: uuid(),
+  };
+  fs.readFile('./db/db.json', 'utf8').then(file => {
+    console.log(file);
+    let parsedArr = JSON.parse(file);
+    parsedArr.push(newNotes);
+    fs.writeFile('./db/db.json', JSON.stringify(parsedArr)).then(
+      () => newNotes,
+    );
+  });
+  // res.json(`${req.method} received.`);
 });
 
 // GET * should return the index.html file.
