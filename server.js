@@ -4,8 +4,6 @@ const { writeFile } = require('fs');
 const fs = require('fs/promises');
 const path = require('path');
 const uuid = require('uuid/v4');
-// const { clog } = require('./middleware/clog');
-// const api = require('./routes/index.js');
 
 const PORT = process.env.PORT || 3001;
 
