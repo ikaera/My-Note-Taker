@@ -1,9 +1,6 @@
-const { text } = require('express');
 const express = require('express');
-const { writeFile } = require('fs');
-const fs = require('fs/promises');
-const path = require('path');
-const uuid = require('uuid/v4');
+
+const routes = require('./routes');
 
 const PORT = process.env.PORT || 3001;
 
@@ -16,67 +13,46 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static('public'));
 
-// HTML routes:
-// GET /notes should return the notes.html file.
-app.get('/notes', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/notes.html')),
-);
-
-// API routes:
-// GET /api/notes should read the db.json file and return all saved notes as JSON.
-app.get('/api/notes', (req, res) =>
-  res.sendFile(path.join(__dirname, './db/db.json')),
-);
-
-// POST /api/notes should receive a new note to save on the request body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved (look into npm packages that could do this for you).
-app.post('/api/notes', (req, res) => {
-  const { title, text } = req.body;
-  const newNotes = {
-    title,
-    text,
-    id: uuid(),
-  };
-  fs.readFile('./db/db.json', 'utf8').then(file => {
-    console.log(file);
-    let parsedArr = JSON.parse(file);
-    parsedArr.push(newNotes);
-    fs.writeFile('./db/db.json', JSON.stringify(parsedArr)).then(() =>
-      res.json(newNotes),
-    );
-  });
-  // res.json(`${req.method} received.`);
-});
-
-// GET * should return the index.html file.
-app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html')),
-);
+app.use(routes);
 
 app.listen(PORT, () =>
   console.log(`App is listening at http://localhost:${PORT} 🚀`),
 );
+// HTML routes:
+// GET /notes should return the notes.html file.
+// app.get('/notes', (req, res) =>
+//   res.sendFile(path.join(__dirname, '/public/notes.html')),
+// );
+
+// API routes:
+// GET /api/notes should read the db.json file and return all saved notes as JSON.
+// app.get('/api/notes', (req, res) =>
+//   res.sendFile(path.join(__dirname, './db/db.json')),
+// );
+
+// POST /api/notes should receive a new note to save on the request body, add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved (look into npm packages that could do this for you).
+// app.post('/api/notes', (req, res) => {
+//   const { title, text } = req.body;
+//   const newNotes = {
+//     title,
+//     text,
+//     id: uuid(),
+//   };
+//   fs.readFile('./db/db.json', 'utf8').then(file => {
+//     console.log(file);
+//     let parsedArr = JSON.parse(file);
+//     parsedArr.push(newNotes);
+//     fs.writeFile('./db/db.json', JSON.stringify(parsedArr)).then(() =>
+//       res.json(newNotes),
+//     );
+//   });
+// res.json(`${req.method} received.`);
+// });
+
+// GET * should return the index.html file.
+// app.get('*', (req, res) =>
+//   res.sendFile(path.join(__dirname, '/public/index.html')),
+// );
+
 // Bonus:
 // DELETE /api/notes/:id should receive a query parameter containing the id of a note to delete. In order to delete a note, you'll need to read all notes from the db.json file, remove the note with the given id property, and then rewrite the notes to the db.json file.//
-
-app.delete('/api/notes/:id', (req, res) => {
-  let notesToDelete = req.params.id;
-
-  fs.readFile(__dirname + '/db/db.json', 'utf8').then((data, err) => {
-    if (err) {
-      throw err;
-    }
-    let json = JSON.parse(data);
-    console.log('BEFORE', json);
-
-    for (let i = 0; i < json.length; i++) {
-      if (json[i].id === notesToDelete) {
-        json.splice(i, 1);
-      }
-    }
-
-    console.log('LAST', json);
-    fs.writeFile('./db/db.json', JSON.stringify(json)).then(() => {
-      res.json({ ok: true });
-    });
-  });
-});
